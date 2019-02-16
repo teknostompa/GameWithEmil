@@ -1,26 +1,63 @@
 package Main;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
+import java.awt.AWTException;
+import java.awt.Canvas;
+import java.awt.Color;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+import java.awt.Graphics;
+import java.awt.Robot;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-@SuppressWarnings("serial")
-public class Main extends JPanel{
-	public static int w = 600;
-	public static int h = 600;
-	public static int woff = w/2;
-	public static int hoff = h/2;
-	public static int cx = 0;
-	public static int cy = 0;
-	public void paint(Graphics g){
-		ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
+
+
+@SuppressWarnings({ "serial", "unused" })
+public class Main  extends JPanel  implements ActionListener, KeyListener {
+
+    Timer tm = new Timer(5, this);
+    int x = 0, y=0, velX = 0, velY = 0;
+    int posx=0, negx=0, posy=0, negy=0;
+    static int h = 600;
+	static int w = 600;
+	int grav;
+	
+
+    public Main() throws IOException {
+        tm.start();
+        addKeyListener(this);
+        setFocusable(true);
+        requestFocusInWindow();
+        setFocusTraversalKeysEnabled(false);
+    }
+
+
+    public void paint(Graphics g) {
+    	BufferedImage image = null;
+		try {
+			image = ImageIO.read(new File("a.jpg"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        super.paintComponent(g);
+        g.setColor(Color.white);
+        g.fillRect(0, 0, w, h);
+        g.setColor(Color.blue);
+        g.fillOval(w/2-25, h/2-25, 50, 50);
+        g.setColor(Color.black);
+        ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
 
 		TileLayer layer =null;
 		try(BufferedReader br = new BufferedReader(new FileReader("World.txt"))){
@@ -50,48 +87,78 @@ public class Main extends JPanel{
 		
 		int width = tempLayout.get(0).size();
 		int height = tempLayout.size();
-
-		g.setColor(Color.white);
-		g.fillRect(0,0,w,h);
-		g.setColor(Color.black);
-		g.fillRect(w/2-25, h/2-25, 50, 50);
 		layer = new TileLayer(width, height);
-		for(int y = 0; y<height; y++) {
-			for(int x = 0; x<width;x++) {
-				layer.map[y][x] = tempLayout.get(y).get(x);
-				if(layer.map[y][x] != 0) {
-					g.fillRect(x*50+cx+woff-100,y*50+cy+hoff+20,50,50);
+		for(int a = 0; a<height; a++) {
+			for(int b = 0; b<width;b++) {
+				layer.map[a][b] = tempLayout.get(a).get(b);
+				if(layer.map[a][b] != 0) {
+			        g.drawImage(image, x+(50*b), y+(50*a), 50, 50, null);
 				}
 			}
 			
 		}
-		repaint();
-	}
-	/*public void GameLoop(Graphics g){
-		g.setColor(Color.white);
-		g.fillRect(0,0,w,h);
-		g.setColor(Color.black);
-		g.fillRect(w/2-25, h/2-25, 50, 50);
-		this.paint(g);
-	}*/
-	static GraphicsConfiguration gc;
-	public static void main(String[] args){
-		Main f = new Main();
-		JFrame frame = new JFrame(gc);
-		frame.setTitle("2D Game");
-		frame.setSize(w,h);
-		frame.setLocation(0,0);
-		frame.setVisible(true);
-		frame.getContentPane().add(new Main());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		Graphics a=frame.getGraphics();
-		boolean running = true;
-		/*while(running == true) {
-			f.GameLoop(a);
-		}*/
-	}
+    }
 
+
+    public void actionPerformed(ActionEvent e) {  
+        velX=posx-negx;
+        velY=posy-negy;
+        x = x + velX;
+        y = y + velY;
+        setFocusable(true);
+        requestFocusInWindow();
+        repaint();
+    }
+    public void keyPressed(KeyEvent e) {
+        int c = e.getKeyCode();
+
+        if (c == KeyEvent.VK_A) {
+            posx = 1;
+        }
+
+        if (c == KeyEvent.VK_D) {
+            negx = 1;
+        }
+
+        if (c == KeyEvent.VK_W) {
+            posy = 1;
+        }
+
+        if (c == KeyEvent.VK_S) {
+            negy = 1;
+        }
+    }
+	public void keyReleased(KeyEvent e) {
+	    int c = e.getKeyCode();
+		if (c == KeyEvent.VK_A) {
+	        posx = 0;
+	    }
 	
-}
+	    if (c == KeyEvent.VK_D) {
+	        negx = 0;
+	    }
+	
+	    if (c == KeyEvent.VK_W) {
+	        posy = 0;
+	    }
+	
+	    if (c == KeyEvent.VK_S) {
+	        negy = 0;
+	    }
+	}
+    @Override
+    public void keyTyped(KeyEvent e) {
 
+    }
+    public static void main(String[] args) throws IOException {
+        Main t = new Main();
+        JFrame frame = new JFrame();
+        frame.setSize(w, h);
+        frame.setTitle("Movement");
+        frame.setVisible(true);
+        frame.setResizable(false);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(t);
+    }
+    
+}
