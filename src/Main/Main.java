@@ -50,7 +50,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 	    imgBuf.setRGB(0, 0, w, h, rgb, 0, w);
 	}
 
-    Timer tm = new Timer(1000, this);
+    Timer tm = new Timer(100, this);
     int x = -800, y=-100, velX = 0, velY = 0;
     int posx=0, negx=0, posy=0, negy=0;
     static int h = 800;
@@ -72,7 +72,9 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 
 
     public void paint(Graphics g) {
+    	tm.start();
     	if(spritesheet==null) {
+    		textures textures = new textures();
     		try {
     			spritesheet = ImageIO.read(new File("ss.png"));
     		} catch (IOException e) {
@@ -121,13 +123,8 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 				layer.map[a][b] = tempLayout.get(a).get(b);
 					if(layer.map[a][b] !=0) {
 						int img= layer.map[a][b];
-						int f = 0;
-						while(img > 32) {
-							f+=1;
-							img-=31;
-						}
-						image = spritesheet.getSubimage(img*16, f*16, 16, 16);
-						g.drawImage(image, x+(50*b), y+(50*a), 50, 50, null);
+						String c = "bedrock";
+						g.drawImage(textures.textures[layer.map[a][b]], x+(50*b), y+(50*a), 50, 50, null);
 				    }
 				}
 			}
