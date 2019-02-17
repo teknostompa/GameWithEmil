@@ -30,8 +30,8 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
     Timer tm = new Timer(1000, this);
     int x = -800, y=-100, velX = 0, velY = 0;
     int posx=0, negx=0, posy=0, negy=0;
-    static int h = 600;
-	static int w = 600;
+    static int h = 800;
+	static int w = 800;
 	int grav;
 	BufferedImage spritesheet = null;
 	BufferedImage image = null;
@@ -99,9 +99,9 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 					if(layer.map[a][b] !=0) {
 						int img= layer.map[a][b];
 						int f = 0;
-						if(img > 15) {
+						while(img > 15) {
 							f+=1;
-							img-=16;
+							img-=15;
 						}
 						image = spritesheet.getSubimage(img*16, f*16, 16, 16);
 				        g.drawImage(image, x+(50*b), y+(50*a), 50, 50, null);
