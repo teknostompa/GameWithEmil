@@ -26,6 +26,29 @@ import java.util.ArrayList;
 
 @SuppressWarnings({ "serial", "unused" })
 public class Main  extends JPanel  implements ActionListener, KeyListener {
+	
+	private static void changeColor(
+	        BufferedImage imgBuf,
+	        int oldRed, int oldGreen, int oldBlue,
+	        int newRed, int newGreen, int newBlue) {
+
+	    int RGB_MASK = 0x00ffffff;
+	    int ALPHA_MASK = 0xff000000;
+
+	    int oldRGB = oldRed << 16 | oldGreen << 8 | oldBlue;
+	    int toggleRGB = oldRGB ^ (newRed << 16 | newGreen << 8 | newBlue);
+
+	    int w = imgBuf.getWidth();
+	    int h = imgBuf.getHeight();
+
+	    int[] rgb = imgBuf.getRGB(0, 0, w, h, null, 0, w);
+	    for (int i = 0; i < rgb.length; i++) {
+	        if ((rgb[i] & RGB_MASK) == oldRGB) {
+	            rgb[i] ^= toggleRGB;
+	        }
+	    }
+	    imgBuf.setRGB(0, 0, w, h, rgb, 0, w);
+	}
 
     Timer tm = new Timer(1000, this);
     int x = -800, y=-100, velX = 0, velY = 0;
@@ -51,7 +74,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
     public void paint(Graphics g) {
     	if(spritesheet==null) {
     		try {
-    			spritesheet = ImageIO.read(new File("ss.jpg"));
+    			spritesheet = ImageIO.read(new File("ss.png"));
     		} catch (IOException e) {
     			e.printStackTrace();
     		}    		
@@ -99,12 +122,12 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 					if(layer.map[a][b] !=0) {
 						int img= layer.map[a][b];
 						int f = 0;
-						while(img > 15) {
+						while(img > 32) {
 							f+=1;
-							img-=15;
+							img-=31;
 						}
 						image = spritesheet.getSubimage(img*16, f*16, 16, 16);
-				        g.drawImage(image, x+(50*b), y+(50*a), 50, 50, null);
+						g.drawImage(image, x+(50*b), y+(50*a), 50, 50, null);
 				    }
 				}
 			}
