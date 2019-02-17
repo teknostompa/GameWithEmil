@@ -22,7 +22,6 @@ public class textures {
                 textures[ci] = ImageIO.read(new File("textures/"+f.getName()));
                 // you probably want something more involved here
                 // to display in your UI
-                System.out.println("image: " + f.getName());
             } catch (final IOException e) {
                 // handle errors here
             }
