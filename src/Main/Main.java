@@ -27,12 +27,13 @@ import java.util.ArrayList;
 @SuppressWarnings({ "serial", "unused" })
 public class Main  extends JPanel  implements ActionListener, KeyListener {
 
-    Timer tm = new Timer(5, this);
-    int x = 0, y=0, velX = 0, velY = 0;
+    Timer tm = new Timer(1000, this);
+    int x = -800, y=-100, velX = 0, velY = 0;
     int posx=0, negx=0, posy=0, negy=0;
     static int h = 600;
 	static int w = 600;
 	int grav;
+	BufferedImage spritesheet = null;
 	BufferedImage image = null;
     ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
 	TileLayer layer =null;
@@ -48,9 +49,9 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 
 
     public void paint(Graphics g) {
-    	if(image==null) {
+    	if(spritesheet==null) {
     		try {
-    			image = ImageIO.read(new File("b.jpg"));
+    			spritesheet = ImageIO.read(new File("ss.jpg"));
     		} catch (IOException e) {
     			e.printStackTrace();
     		}    		
@@ -95,7 +96,14 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 		for(int a = 0; a<height; a++) {
 			for(int b = 0; b<width;b++) {
 				layer.map[a][b] = tempLayout.get(a).get(b);
-					if(layer.map[a][b] == 1) {
+					if(layer.map[a][b] !=0) {
+						int img= layer.map[a][b];
+						int f = 0;
+						if(img > 15) {
+							f+=1;
+							img-=16;
+						}
+						image = spritesheet.getSubimage(img*16, f*16, 16, 16);
 				        g.drawImage(image, x+(50*b), y+(50*a), 50, 50, null);
 				    }
 				}
@@ -109,18 +117,15 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
         for(int yp=-24; yp<25;yp++) {
         	xpos=(x-h/2-25)/-50;
 			ypos=(y-w/2+yp)/-50;
-            if(layer.map[ypos][xpos]==0) {
-            	
-    	    }else {
+            if(layer.map[ypos][xpos]!=0) {
     	    	if(velX<0) {
     	    		movex=0;
     	    	}
+            	
     	    }
     		xpos=(x-h/2+25)/-50;
     		ypos=(y-w/2+yp)/-50;
-            if(layer.map[ypos][xpos]==0) {
-            	
-    	    }else {
+            if(layer.map[ypos][xpos]!=0) {
     	    	if(velX>0) {
     	    		movex=0;
     	    	}
@@ -132,18 +137,14 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
         for(int xp=-24; xp<25;xp++) {
         	xpos=(x-h/2+xp)/-50;
 			ypos=(y-w/2-25)/-50;
-            if(layer.map[ypos][xpos]==0) {
-            	
-    	    }else {
+            if(layer.map[ypos][xpos]!=0) {
     	    	if(velY<0) {
     	    		movey=0;
     	    	}
     	    }
     		xpos=(x-h/2+xp)/-50;
     		ypos=(y-w/2+25)/-50;
-            if(layer.map[ypos][xpos]==0) {
-            	
-    	    }else {
+            if(layer.map[ypos][xpos]!=0) {
     	    	if(velY>0) {
     	    		movey=0;
     	    	}
@@ -152,7 +153,6 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
         if(movey==1) {
         	y = y + velY;
         }
-	    System.out.println(layer.map[xpos][ypos]);
         setFocusable(true);
         requestFocusInWindow();
         repaint();
