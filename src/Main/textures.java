@@ -10,16 +10,24 @@ import javax.imageio.ImageIO;
 public class textures {
 	static BufferedImage[] textures;
 	public textures() {
-		textures = new BufferedImage[566];
-		try {
-			textures[1] = ImageIO.read(new File("textures/acacia_door_bottom.png"));
-			textures[2] = ImageIO.read(new File("textures/acacia_door_top.png"));
-			textures[3] = ImageIO.read(new File("textures/acacia_leaves.png"));
-			textures[4] = ImageIO.read(new File("textures/acacia_log_top.png"));
-			textures[5] = ImageIO.read(new File("textures/acacia_log.png"));
-			textures[6] = ImageIO.read(new File("textures/acacia_planks.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		textures = new BufferedImage[600];
+		
+		int ci = 1;
+		final File dir = new File("textures");
+		for (final File f : dir.listFiles()) {
+            BufferedImage img = null;
+
+            try {
+                img = ImageIO.read(f);
+                textures[ci] = ImageIO.read(new File("textures/"+f.getName()));
+                // you probably want something more involved here
+                // to display in your UI
+                System.out.println("image: " + f.getName());
+            } catch (final IOException e) {
+                // handle errors here
+            }
+            ci+=1;
+        }
+
 	}
 }
