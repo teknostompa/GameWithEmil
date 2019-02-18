@@ -79,7 +79,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
     			spritesheet = ImageIO.read(new File("ss.png"));
     		} catch (IOException e) {
     			e.printStackTrace();
-    		}    		
+    		}    	
     		
     		try(BufferedReader br = new BufferedReader(new FileReader("World.txt"))){
     			String currentLine;
@@ -113,7 +113,6 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
         g.setColor(Color.blue);
         g.fillRect(w/2-25, h/2-25, 50, 50);
         g.setColor(Color.black);
-
 		
 		int width = tempLayout.get(0).size();
 		int height = tempLayout.size();
@@ -151,7 +150,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
     	    	}
     	    }
         }
-        if(movex == 1) {
+        if(movex == 1 && !(velX>0 && x==375)) {
 	        x = x + velX;
         }
         for(int xp=-24; xp<25;xp++) {
@@ -170,11 +169,12 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
     	    	}
     	    }
         }
-        if(movey==1) {
+        if(movey==1 && !(velY>0 && y==375)) {
         	y = y + velY;
         }
         setFocusable(true);
         requestFocusInWindow();
+        System.out.println(x + "" + y);
         repaint();
 		}
 

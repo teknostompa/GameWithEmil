@@ -18,8 +18,7 @@ public class textures {
             BufferedImage img = null;
 
             try {
-                img = ImageIO.read(f);
-                textures[ci] = ImageIO.read(new File("textures/"+f.getName()));
+                textures[ci] = ImageIO.read(f);
                 // you probably want something more involved here
                 // to display in your UI
             } catch (final IOException e) {
