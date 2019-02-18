@@ -49,9 +49,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 	    }
 	    imgBuf.setRGB(0, 0, w, h, rgb, 0, w);
 	}
-
-    Timer tm = new Timer(100, this);
-    int x = -800, y=-100, velX = 0, velY = 0;
+    int x = -700, y=-100, velX = 0, velY = 0;
     int posx=0, negx=0, posy=0, negy=0;
     static int h = 800;
 	static int w = 800;
@@ -63,7 +61,6 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 	
 
     public Main() throws IOException {
-        tm.start();
         addKeyListener(this);
         setFocusable(true);
         requestFocusInWindow();
@@ -72,7 +69,6 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 
 
     public void paint(Graphics g) {
-    	tm.start();
     	if(spritesheet==null) {
     		textures textures = new textures();
     		try {
@@ -110,9 +106,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
         super.paintComponent(g);
         g.setColor(Color.white);
         g.fillRect(0, 0, w, h);
-        g.setColor(Color.blue);
-        g.fillRect(w/2-25, h/2-25, 50, 50);
-        g.setColor(Color.black);
+        //g.setColor(Color.black);
 		
 		int width = tempLayout.get(0).size();
 		int height = tempLayout.size();
@@ -136,15 +130,15 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
         for(int yp=-24; yp<25;yp++) {
         	xpos=(x-h/2-25)/-50;
 			ypos=(y-w/2+yp)/-50;
-            if(layer.map[ypos][xpos]!=0) {
+            if(layer.map[ypos][xpos]!=0 && velX<0) {
     	    	if(velX<0) {
     	    		movex=0;
     	    	}
             	
     	    }
-    		xpos=(x-h/2+25)/-50;
+    		xpos=(x-h/2+26)/-50;
     		ypos=(y-w/2+yp)/-50;
-            if(layer.map[ypos][xpos]!=0) {
+            if(layer.map[ypos][xpos]!=0 && velX>0) {
     	    	if(velX>0) {
     	    		movex=0;
     	    	}
@@ -156,14 +150,14 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
         for(int xp=-24; xp<25;xp++) {
         	xpos=(x-h/2+xp)/-50;
 			ypos=(y-w/2-25)/-50;
-            if(layer.map[ypos][xpos]!=0) {
+            if(layer.map[ypos][xpos]!=0 && velY<0) {
     	    	if(velY<0) {
     	    		movey=0;
     	    	}
     	    }
     		xpos=(x-h/2+xp)/-50;
-    		ypos=(y-w/2+25)/-50;
-            if(layer.map[ypos][xpos]!=0) {
+    		ypos=(y-w/2+26)/-50;
+            if(layer.map[ypos][xpos]!=0 && velY>0) {
     	    	if(velY>0) {
     	    		movey=0;
     	    	}
@@ -172,9 +166,9 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
         if(movey==1 && !(velY>0 && y==375)) {
         	y = y + velY;
         }
-        setFocusable(true);
+        g.setColor(Color.black);
+        g.fillRect(w/2-25, h/2-25, 50, 50);
         requestFocusInWindow();
-        System.out.println(x + "" + y);
         repaint();
 		}
 
