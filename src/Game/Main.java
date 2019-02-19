@@ -84,16 +84,17 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
     }
     
     public void addComponentsToPane(Container pane) {
-        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+        pane.setLayout(new BorderLayout());
         addAButton("Play", pane);
     }
     
     private void addAButton(String text, Container container) {
-    	button.setAlignmentX(Component.CENTER_ALIGNMENT);
+    	//button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.addActionListener(this);
         button.setActionCommand("Geeks");
         Rectangle r = new Rectangle(200, 50);
-        button.setBounds(r);
+        //button.setBounds(r);
+        
         container.add(button,BorderLayout.CENTER);
     }
 
@@ -201,6 +202,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 	        g.fillRect(w/2-25, h/2-25, 50, 50);
 	        requestFocusInWindow();
 	        button.setVisible(false);
+    		g.drawString("Version : 1.0.8", 10, 20);
 	        repaint();
     	}else if(title == 1) {
     		frame.getContentPane().setLayout(new FlowLayout());
