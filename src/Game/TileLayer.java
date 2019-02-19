@@ -1,4 +1,4 @@
-package Main;
+package Game;
 
 public class TileLayer {
 	int[][] map;
