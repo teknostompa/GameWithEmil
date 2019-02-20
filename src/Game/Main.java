@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Font;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -24,6 +25,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,7 +40,7 @@ import java.awt.Button;
 
 
 @SuppressWarnings({ "serial", "unused" })
-public class Main  extends JPanel  implements ActionListener, KeyListener {
+public class Main  extends JPanel  implements ActionListener, KeyListener, MouseListener {
 	
 	private static void changeColor(
 	        BufferedImage imgBuf,
@@ -74,10 +77,14 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
     static JFrame frame = new JFrame();
     Button b = null;
     JButton button = new JButton("Play");
+    int health = 20;
+    String[] saves;
+    String world;
 	
 
     public Main() throws IOException {
         addKeyListener(this);
+        addMouseListener(this);
         setFocusable(true);
         requestFocusInWindow();
         setFocusTraversalKeysEnabled(false);
@@ -104,12 +111,13 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 	    	if(spritesheet==null) {
 	    		textures textures = new textures();
 	    		try {
-	    			spritesheet = ImageIO.read(new File("ss.png"));
-	    		} catch (IOException e) {
-	    			e.printStackTrace();
-	    		}    	
+					spritesheet = ImageIO.read(new File("ss.png"));
+				} catch (IOException e1) {
+					
+					e1.printStackTrace();
+				}    	
 	    		
-	    		try(BufferedReader br = new BufferedReader(new FileReader("World.txt"))){
+	    		try(BufferedReader br = new BufferedReader(new FileReader("maps/"+world))){
 	    			String currentLine;
 	    			while((currentLine = br.readLine()) != null) {
 	    				if(currentLine.isEmpty()) {
@@ -133,28 +141,24 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 	    		catch(IOException e) {
 	    			
 	    		}
+	    		int width = tempLayout.get(0).size();
+				int height = tempLayout.size();
+				layer = new TileLayer(width, height);
+				for(int a = 0; a<height; a++) {
+					for(int b = 0; b<width;b++) {
+						layer.map[a][b] = tempLayout.get(a).get(b);
+					}
+				}
+				
 	    		
 	    	}
 	        super.paintComponent(g);
-	        g.setColor(Color.white);
-	        g.fillRect(0, 0, w, h);
-	        //g.setColor(Color.black);
 			
 			int width = tempLayout.get(0).size();
 			int height = tempLayout.size();
-			layer = new TileLayer(width, height);
-			for(int a = 0; a<height; a++) {
-				for(int b = 0; b<width;b++) {
-					layer.map[a][b] = tempLayout.get(a).get(b);
-					if(layer.map[a][b] !=0) {
-						int img= layer.map[a][b];
-						String c = "bedrock";
-						g.drawImage(textures.textures[layer.map[a][b]], x+(50*b), y+(50*a), 50, 50, null);
-				    }
-				}
-			}
-			int xpos=(x-h/2-25)/-50;
-			int ypos=(y-w/2-25)/-50;
+		    graphics graphics = new graphics(height, width, layer, x, y, g, w, h);
+			int xpos;
+			int ypos;
 			velX=posx-negx;
 	        velY=posy-negy;
 	        int movex = 1;
@@ -203,25 +207,60 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
 	        requestFocusInWindow();
 	        button.setVisible(false);
     		g.drawString("Version : 1.0.8", 10, 20);
+    		g.setColor(Color.RED);
+    		g.fillRoundRect(w-20-(health*10), 20, health*10, 30, 10, 10);
+    		if(health<0) {
+    	        button.setVisible(true);
+    			title=1;
+    			health=20;
+    		}
 	        repaint();
     	}else if(title == 1) {
-    		frame.getContentPane().setLayout(new FlowLayout());
-            addComponentsToPane(frame.getContentPane());
-            System.out.println("yes");
+    		int cf=1;
+			File dir = new File("maps");
+			for(final File f : dir.listFiles()) {
+    			cf+=1;
+			}
+			saves = new String[cf];
+			cf=1;
+    		for (final File f : dir.listFiles()) {
+    			saves[cf]=f.getName();
+    			cf+=1;
+    		}
+    		//frame.getContentPane().setLayout(new FlowLayout());
+            //addComponentsToPane(frame.getContentPane());
+            g.fillRect(0, 0, w, h);
+            g.setColor(Color.white);
+            g.setFont(new Font("arial", Font.PLAIN, 25));
+    		cf=1;
+    		dir = new File("maps");
+    		for (final File f : dir.listFiles()) {
+    			g.drawString(f.getName(), 100, 10+(cf*50));
+    			cf+=1;
+    		}
+            repaint();
     	}
 	}
 
 
     public void actionPerformed(ActionEvent e) {
+    	Graphics g = getGraphics();
     	String action = e.getActionCommand();
 	    if (action.equals("Geeks")) {
 	        title=0;
+            g.fillRect(0, 0, 200, h);
+            g.fillRect(0, 0, w, 220);
+            g.fillRect(w-200, 0, 200, h);
+            g.fillRect(0, h-250, w, 250);
 	        repaint();
 	    }
     }
     public void keyPressed(KeyEvent e) {
         int c = e.getKeyCode();
 
+        if(c == KeyEvent.VK_H) {
+        	health -=1;
+        }
         if (c == KeyEvent.VK_A) {
             posx = 1;
         }
@@ -269,5 +308,40 @@ public class Main  extends JPanel  implements ActionListener, KeyListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(t);
     }
-    
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        int x=e.getX();
+        int y=e.getY();
+        if(title == 1) {
+        	y = (y+10)/50;
+        	System.out.println(y);
+        	world = saves[y];
+        	title=0;
+        }
+    }
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
