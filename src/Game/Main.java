@@ -41,38 +41,15 @@ import java.awt.Button;
 
 @SuppressWarnings({ "serial", "unused" })
 public class Main  extends JPanel  implements ActionListener, KeyListener, MouseListener {
-	
-	private static void changeColor(
-	        BufferedImage imgBuf,
-	        int oldRed, int oldGreen, int oldBlue,
-	        int newRed, int newGreen, int newBlue) {
-
-	    int RGB_MASK = 0x00ffffff;
-	    int ALPHA_MASK = 0xff000000;
-
-	    int oldRGB = oldRed << 16 | oldGreen << 8 | oldBlue;
-	    int toggleRGB = oldRGB ^ (newRed << 16 | newGreen << 8 | newBlue);
-
-	    int w = imgBuf.getWidth();
-	    int h = imgBuf.getHeight();
-
-	    int[] rgb = imgBuf.getRGB(0, 0, w, h, null, 0, w);
-	    for (int i = 0; i < rgb.length; i++) {
-	        if ((rgb[i] & RGB_MASK) == oldRGB) {
-	            rgb[i] ^= toggleRGB;
-	        }
-	    }
-	    imgBuf.setRGB(0, 0, w, h, rgb, 0, w);
-	}
     int x = -750, y=-100, velX = 0, velY = 0;
     int posx=0, negx=0, posy=0, negy=0;
     int title=1;
     static int h = 600;
 	static int w = 600;
 	int grav;
+	int height, width;
 	BufferedImage spritesheet = null;
 	BufferedImage image = null;
-    ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
 	TileLayer layer =null;
     static JFrame frame = new JFrame();
     Button b = null;
@@ -80,7 +57,8 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     int health = 20;
     String[] saves;
     String world;
-	
+	String prevworld = null;
+    ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
 
     public Main() throws IOException {
         addKeyListener(this);
@@ -89,35 +67,18 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         requestFocusInWindow();
         setFocusTraversalKeysEnabled(false);
     }
-    
-    public void addComponentsToPane(Container pane) {
-        pane.setLayout(new BorderLayout());
-        addAButton("Play", pane);
-    }
-    
-    private void addAButton(String text, Container container) {
-    	//button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.addActionListener(this);
-        button.setActionCommand("Geeks");
-        Rectangle r = new Rectangle(200, 50);
-        //button.setBounds(r);
-        
-        container.add(button,BorderLayout.CENTER);
-    }
 
     public void paint(Graphics g) {
     	if(title==0) {
 	    
-	    	if(spritesheet==null) {
+	    	if(!world.equals(prevworld)) {
+	    		System.out.println("yes");
 	    		textures textures = new textures();
-	    		try {
-					spritesheet = ImageIO.read(new File("ss.png"));
-				} catch (IOException e1) {
-					
-					e1.printStackTrace();
-				}    	
-	    		
+	    	    //ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
+	    		tempLayout.clear();
 	    		try(BufferedReader br = new BufferedReader(new FileReader("maps/"+world))){
+
+		    		System.out.println(world);
 	    			String currentLine;
 	    			while((currentLine = br.readLine()) != null) {
 	    				if(currentLine.isEmpty()) {
@@ -134,7 +95,6 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 	    						row.add(id);
 	    					}
 	    				}
-	    				
 	    				tempLayout.add(row);
 	    			}
 	    		}
@@ -149,8 +109,9 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 						layer.map[a][b] = tempLayout.get(a).get(b);
 					}
 				}
-				
-	    		
+				x = -750; 
+				y=-100;
+				prevworld=world;
 	    	}
 	        super.paintComponent(g);
 			
@@ -316,6 +277,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         	y = (y+10)/50;
         	System.out.println(y);
         	world = saves[y];
+        	spritesheet=null;
         	title=0;
         }
     }

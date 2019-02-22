@@ -16,10 +16,7 @@ public class textures {
 		for (final File f : dir.listFiles()) {
             try {
                 textures[ci] = ImageIO.read(f);
-                // you probably want something more involved here
-                // to display in your UI
             } catch (final IOException e) {
-                // handle errors here
             }
             ci+=1;
         }
