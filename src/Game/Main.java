@@ -56,8 +56,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 
     @SuppressWarnings("unused")
 	public void paint(Graphics g) {
-    	if(title==0) {
-	    
+    	if(title==0||title==2) {
 	    	if(!world.equals(prevworld)) {
 	    		System.out.println("yes");
 	    		new textures();
@@ -111,6 +110,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 	        velY=posy-negy;
 	        int movex = 1;
 	        int movey = 1;
+	        if(title==0) {
 	        for(int yp=-24; yp<26;yp++) {
 	        	xpos=(x-h/2-25)/-50;
 				ypos=(y-w/2+yp)/-50;
@@ -150,6 +150,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 	        if(movey==1 && !(velY>0 && y==375)) {
 	        	y = y + velY;
 	        }
+	        }
 	        g.setColor(Color.black);
 	        g.fillRect(w/2-25, h/2-25, 50, 50);
 	        requestFocusInWindow();
@@ -161,6 +162,11 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     	        button.setVisible(true);
     			title=1;
     			health=20;
+    		}
+    		if(title==2) {
+    			Color c = new Color(0, 0, 0, 100);
+    			g.setColor(c);
+    			g.fillRect(7, h-65, w-20, 30);
     		}
 	        repaint();
     	}else if(title == 1) {
@@ -205,7 +211,14 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     }
     public void keyPressed(KeyEvent e) {
         int c = e.getKeyCode();
-
+        
+        if(c == KeyEvent.VK_T && title == 0) {
+        	title = 2;
+        	System.out.println(title);
+        }else if(c == KeyEvent.VK_T && title == 2) {
+        	title = 0;
+        }
+        
         if(c == KeyEvent.VK_H && title==0) {
         	health -=1;
         }
