@@ -56,7 +56,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 
     @SuppressWarnings("unused")
 	public void paint(Graphics g) {
-    	if(title==0||title==2) {
+    	if(title==0||title==2||title==3) {
 	    	if(!world.equals(prevworld)) {
 	    		System.out.println("yes");
 	    		new textures();
@@ -160,13 +160,27 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     		g.fillRoundRect(w-20-(health*10), 20, health*10, 30, 10, 10);
     		if(health==0) {
     	        button.setVisible(true);
-    			title=1;
-    			health=20;
+    			title=3;
     		}
     		if(title==2) {
     			Color c = new Color(0, 0, 0, 100);
     			g.setColor(c);
     			g.fillRect(7, h-65, w-20, 30);
+    		}
+    		if(title==3) {
+    			Color c = new Color(0, 0, 0, 255);
+    			g.setColor(c);
+    			g.fillRect(w/2-150,	h/2-30, 300, 60);
+    			g.fillRect(w/2-150,	h/2+60, 300, 60);
+    			c= new Color(255,255,255);
+    			g.setColor(c);
+                g.setFont(new Font("arial", Font.PLAIN, 25));
+    			String text="Respawn";
+    			int wi =g.getFontMetrics().stringWidth(text);
+    			g.drawString("Respawn", w/2-(wi/2), h/2+5);
+    			text="Back to menu";
+    			wi =g.getFontMetrics().stringWidth(text);
+    			g.drawString(text, w/2-(wi/2), h/2+95);
     		}
 	        repaint();
     	}else if(title == 1) {
@@ -214,7 +228,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         
         if(c == KeyEvent.VK_T && title == 0) {
         	title = 2;
-        	System.out.println(title);
+        	printint(title);
         }else if(c == KeyEvent.VK_T && title == 2) {
         	title = 0;
         }
@@ -271,7 +285,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-        e.getX();
+        int x = e.getX();
         int y=e.getY();
         if(title == 1) {
         	y = (y+10)/50;
@@ -279,6 +293,17 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         	world = saves[y];
         	spritesheet=null;
         	title=0;
+        }
+        if(title == 3) {
+        	if(y>h/2-30 && y<h/2+30 && x>w/2-150 && x<w/2+150) {
+        		health=20;
+        		title=0;
+        	}
+        	if(y>h/2+60 && y<h/2+90 && x>w/2-150 && x<w/2+150) {
+        		//TODO saving
+        		health=20;
+        		title=1;
+        	}
         }
     }
 
@@ -304,6 +329,12 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+	public void print(String s) {
+		System.out.print(s);
+	}
+	public void printint(int i) {
+		System.out.println(i);
 	}
 
 }
