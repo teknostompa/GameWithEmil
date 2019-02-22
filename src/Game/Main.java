@@ -1,26 +1,12 @@
 package Game;
-import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import java.awt.AWTException;
-import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.Font;
 
 import javax.swing.JPanel;
-import javax.swing.Timer;
-
 import java.awt.Graphics;
-import java.awt.LayoutManager;
-import java.awt.Rectangle;
-import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -39,9 +25,9 @@ import java.awt.Button;
 
 
 
-@SuppressWarnings({ "serial", "unused" })
 public class Main  extends JPanel  implements ActionListener, KeyListener, MouseListener {
-    int x = -750, y=-100, velX = 0, velY = 0;
+	private static final long serialVersionUID = 1L;
+	int x = -750, y=-100, velX = 0, velY = 0;
     int posx=0, negx=0, posy=0, negy=0;
     int title=1;
     static int h = 600;
@@ -68,12 +54,13 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         setFocusTraversalKeysEnabled(false);
     }
 
-    public void paint(Graphics g) {
+    @SuppressWarnings("unused")
+	public void paint(Graphics g) {
     	if(title==0) {
 	    
 	    	if(!world.equals(prevworld)) {
 	    		System.out.println("yes");
-	    		textures textures = new textures();
+	    		new textures();
 	    	    //ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
 	    		tempLayout.clear();
 	    		try(BufferedReader br = new BufferedReader(new FileReader("maps/"+world))){
@@ -117,7 +104,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 			
 			int width = tempLayout.get(0).size();
 			int height = tempLayout.size();
-		    graphics graphics = new graphics(height, width, layer, x, y, g, w, h);
+		    new graphics(height, width, layer, x, y, g, w, h);
 			int xpos;
 			int ypos;
 			velX=posx-negx;
@@ -170,7 +157,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     		g.drawString("Version : 1.0.8", 10, 20);
     		g.setColor(Color.RED);
     		g.fillRoundRect(w-20-(health*10), 20, health*10, 30, 10, 10);
-    		if(health<0) {
+    		if(health==0) {
     	        button.setVisible(true);
     			title=1;
     			health=20;
@@ -219,7 +206,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     public void keyPressed(KeyEvent e) {
         int c = e.getKeyCode();
 
-        if(c == KeyEvent.VK_H) {
+        if(c == KeyEvent.VK_H && title==0) {
         	health -=1;
         }
         if (c == KeyEvent.VK_A) {
@@ -271,7 +258,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-        int x=e.getX();
+        e.getX();
         int y=e.getY();
         if(title == 1) {
         	y = (y+10)/50;
