@@ -27,7 +27,8 @@ import java.awt.Button;
 
 public class Main  extends JPanel  implements ActionListener, KeyListener, MouseListener {
 	private static final long serialVersionUID = 1L;
-	int x = -750, y=-100, velX = 0, velY = 0;
+	int spawnx = -750, spawny = -100;
+	int x = spawnx, y= spawny, velX = 0, velY = 0;
     int posx=0, negx=0, posy=0, negy=0;
     int title=1;
     static int h = 600;
@@ -58,13 +59,11 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 	public void paint(Graphics g) {
     	if(title==0||title==2||title==3) {
 	    	if(!world.equals(prevworld)) {
-	    		System.out.println("yes");
 	    		new textures();
 	    	    //ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
 	    		tempLayout.clear();
 	    		try(BufferedReader br = new BufferedReader(new FileReader("maps/"+world))){
 
-		    		System.out.println(world);
 	    			String currentLine;
 	    			while((currentLine = br.readLine()) != null) {
 	    				if(currentLine.isEmpty()) {
@@ -228,7 +227,6 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         
         if(c == KeyEvent.VK_T && title == 0) {
         	title = 2;
-        	printint(title);
         }else if(c == KeyEvent.VK_T && title == 2) {
         	title = 0;
         }
@@ -285,25 +283,54 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-        int x = e.getX();
-        int y=e.getY();
+        int x1 = e.getX();
+        int y1=e.getY();
         if(title == 1) {
-        	y = (y+10)/50;
-        	System.out.println(y);
-        	world = saves[y];
+        	y1 = (y1+10)/50;
+        	world = saves[y1];
         	spritesheet=null;
         	title=0;
         }
         if(title == 3) {
-        	if(y>h/2-30 && y<h/2+30 && x>w/2-150 && x<w/2+150) {
+        	if(y1>h/2-30 && y1<h/2+30 && x1>w/2-150 && x1<w/2+150) {
+            	x=spawnx;
+                y=spawny;
         		health=20;
         		title=0;
         	}
-        	if(y>h/2+60 && y<h/2+90 && x>w/2-150 && x<w/2+150) {
+        	if(y1>h/2+60 && y1<h/2+90 && x1>w/2-150 && x1<w/2+150) {
         		//TODO saving
         		health=20;
         		title=1;
         	}
+        }
+        if(title == 0) {
+        	if(e.getButton()==MouseEvent.BUTTON3) {
+        	int tilex=x/50;
+        	int tiley=y/50;
+        	int mx =(x1-x%50)/50;
+        	int my =(y1-y%50)/50;
+        	tilex-=mx;
+        	tiley-=my;
+        	printint(tilex);
+        	printint(tiley);
+        	layer.map[-tiley][-tilex] = 5;
+        	
+        }
+        }
+        if(title == 0) {
+        	if(e.getButton()==MouseEvent.BUTTON1) {
+        	int tilex=x/50;
+        	int tiley=y/50;
+        	int mx =(x1-x%50)/50;
+        	int my =(y1-y%50)/50;
+        	tilex-=mx;
+        	tiley-=my;
+        	printint(tilex);
+        	printint(tiley);
+        	layer.map[-tiley][-tilex] = 0;
+        	
+        }
         }
     }
 
