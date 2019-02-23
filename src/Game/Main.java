@@ -315,7 +315,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         	printint(tilex);
         	printint(tiley);
         	layer.map[-tiley][-tilex] = 5;
-        	
+        	//TODO add block selecting thingo
         }
         }
         if(title == 0) {
