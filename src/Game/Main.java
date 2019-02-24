@@ -15,17 +15,20 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.awt.Button;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 
 
 
-
-public class Main  extends JPanel  implements ActionListener, KeyListener, MouseListener {
+public class Main  extends JPanel  implements ActionListener, KeyListener, MouseListener, MouseWheelListener {
 	private static final long serialVersionUID = 1L;
 	int spawnx = -750, spawny = -100;
 	int x = spawnx, y= spawny, velX = 0, velY = 0;
@@ -46,9 +49,12 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     String world;
 	String prevworld = null;
     ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
+    int SelectedBlock = 1;
+    int menu = 0;
 
     public Main() throws IOException {
         addKeyListener(this);
+        addMouseWheelListener(this);
         addMouseListener(this);
         setFocusable(true);
         requestFocusInWindow();
@@ -154,12 +160,19 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 	        g.fillRect(w/2-25, h/2-25, 50, 50);
 	        requestFocusInWindow();
 	        button.setVisible(false);
-    		g.drawString("Version : 1.0.8", 10, 20);
+    		g.drawString("Version : 1.1.0", 10, 20);
+    		g.setFont(new Font("arial", Font.PLAIN, 20));
+    		g.drawString("Selected Block: #" + SelectedBlock + " " + textures.names[SelectedBlock], 10, h-50);
     		g.setColor(Color.RED);
     		g.fillRoundRect(w-20-(health*10), 20, health*10, 30, 10, 10);
     		if(health==0) {
     	        button.setVisible(true);
     			title=3;
+    		}
+    		if(menu==1) {
+    	        button.setVisible(true);
+    			title=4;
+    			menu=0;
     		}
     		if(title==2) {
     			Color c = new Color(0, 0, 0, 100);
@@ -176,7 +189,22 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
                 g.setFont(new Font("arial", Font.PLAIN, 25));
     			String text="Respawn";
     			int wi =g.getFontMetrics().stringWidth(text);
-    			g.drawString("Respawn", w/2-(wi/2), h/2+5);
+    			g.drawString(text, w/2-(wi/2), h/2+5);
+    			text="Back to menu";
+    			wi =g.getFontMetrics().stringWidth(text);
+    			g.drawString(text, w/2-(wi/2), h/2+95);
+    		}
+    		if(title==4) {
+    			Color c = new Color(0, 0, 0, 255);
+    			g.setColor(c);
+    			g.fillRect(w/2-150,	h/2-30, 300, 60);
+    			g.fillRect(w/2-150,	h/2+60, 300, 60);
+    			c= new Color(255,255,255);
+    			g.setColor(c);
+                g.setFont(new Font("arial", Font.PLAIN, 25));
+    			String text="Return to game";
+    			int wi =g.getFontMetrics().stringWidth(text);
+    			g.drawString(text, w/2-(wi/2), h/2+5);
     			text="Back to menu";
     			wi =g.getFontMetrics().stringWidth(text);
     			g.drawString(text, w/2-(wi/2), h/2+95);
@@ -249,6 +277,9 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         if (c == KeyEvent.VK_S) {
             negy = 1;
         }
+        if (c == KeyEvent.VK_ESCAPE) {
+	        menu=1;
+        }
     }
 	public void keyReleased(KeyEvent e) {
 	    int c = e.getKeyCode();
@@ -297,11 +328,25 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
                 y=spawny;
         		health=20;
         		title=0;
+        		repaint();
         	}
         	if(y1>h/2+60 && y1<h/2+90 && x1>w/2-150 && x1<w/2+150) {
-        		//TODO saving
+        		save();
         		health=20;
         		title=1;
+        		repaint();
+        	}
+        }
+        if(title == 4) {
+        	if(y1>h/2-30 && y1<h/2+30 && x1>w/2-150 && x1<w/2+150) {
+        		title=0;
+        		repaint();
+        	}
+        	if(y1>h/2+60 && y1<h/2+90 && x1>w/2-150 && x1<w/2+150) {
+        		save();
+        		health=20;
+        		title=1;
+        		repaint();
         	}
         }
         if(title == 0) {
@@ -312,13 +357,12 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         	int my =(y1-y%50)/50;
         	tilex-=mx;
         	tiley-=my;
-        	printint(tilex);
-        	printint(tiley);
-        	layer.map[-tiley][-tilex] = 5;
-        	//TODO add block selecting thingo
+        	if(layer.map[-tiley][-tilex] == 0) {        		
+        		layer.map[-tiley][-tilex] = SelectedBlock;
+        	}
         }
         }
-        if(title == 0) {
+        if(title == 0 && prevworld == world) {
         	if(e.getButton()==MouseEvent.BUTTON1) {
         	int tilex=x/50;
         	int tiley=y/50;
@@ -326,9 +370,9 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         	int my =(y1-y%50)/50;
         	tilex-=mx;
         	tiley-=my;
-        	printint(tilex);
-        	printint(tiley);
-        	layer.map[-tiley][-tilex] = 0;
+        	if(layer.map[-tiley][-tilex] != 0) {
+        		layer.map[-tiley][-tilex] = 0;
+        	}
         	
         }
         }
@@ -336,32 +380,54 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	public void mouseExited(MouseEvent arg0) {		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 	public void print(String s) {
 		System.out.print(s);
 	}
 	public void printint(int i) {
 		System.out.println(i);
+	}
+	
+	public void save() {
+		FileWriter fstream;
+		try {
+			fstream = new FileWriter("maps/"+world, false);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    out.flush();
+		    for(int x=0; x<layer.map.length; x++) {
+		    	for(int y=0; y<layer.map[0].length; y++) {
+		    		String a =String.valueOf(layer.map[x][y]);
+				    out.write(a+" ");
+		    	}
+		    	out.write("\n");
+		    }
+		    out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent m) {
+		int range = m.getWheelRotation();
+		SelectedBlock+=range;
+		if(SelectedBlock<1) {
+			SelectedBlock=textures.textures.length-1;
+		}
+		if(SelectedBlock>textures.textures.length-1) {
+			SelectedBlock=1;
+		}
 	}
 
 }
