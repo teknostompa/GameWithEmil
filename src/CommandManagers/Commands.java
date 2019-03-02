@@ -9,6 +9,7 @@ public class Commands {
 		{"0","1"},
 		{"no"}
 	};
+	
 	public void runCommand(String[] a, String b) {
 		try {
 		if(b == commands[0][0]) {

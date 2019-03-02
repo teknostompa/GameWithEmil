@@ -32,9 +32,7 @@ public class Load {
 				Main.tempLayout.add(row);
 			}
 		}
-		catch(IOException e) {
-			
-		}
+		catch(IOException e) {}
 		int width = Main.tempLayout.get(0).size();
 		int height = Main.tempLayout.size();
 		Main.map = new int[height][width];

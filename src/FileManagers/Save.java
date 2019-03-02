@@ -7,6 +7,7 @@ import java.io.IOException;
 import Game.Main;
 
 public class Save {
+	
 	public static void save() {
 		FileWriter fstream;
 		try {

@@ -27,7 +27,6 @@ import FileManagers.Save;
 import FileManagers.textures;
 
 
-
 public class Main  extends JPanel  implements ActionListener, KeyListener, MouseListener, MouseWheelListener {
 	private static final long serialVersionUID = 1L;
 	public static int spawnx = -750;
