@@ -1,11 +1,7 @@
 package Game;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-
+import java.awt.Button;
 import java.awt.Color;
 import java.awt.Font;
-
-import javax.swing.JPanel;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,45 +9,53 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.awt.Button;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import Player.CollideAndMove;
+import CommandManagers.ParseCommand;
+import FileManagers.Load;
+import FileManagers.Save;
+import FileManagers.textures;
 
 
 
 public class Main  extends JPanel  implements ActionListener, KeyListener, MouseListener, MouseWheelListener {
 	private static final long serialVersionUID = 1L;
-	int spawnx = -750, spawny = -100;
-	int x = spawnx, y= spawny, velX = 0, velY = 0;
-    int posx=0, negx=0, posy=0, negy=0;
-    int title=1;
-    static int h = 600;
-	static int w = 600;
-	int grav;
-	int height, width;
-	BufferedImage spritesheet = null;
-	BufferedImage image = null;
-	TileLayer layer =null;
-    static JFrame frame = new JFrame();
-    Button b = null;
-    JButton button = new JButton("Play");
-    int health = 20;
-    String[] saves;
-    String world;
-	String prevworld = null;
-    ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
-    int SelectedBlock = 1;
-    int menu = 0;
-
+	public static int spawnx = -750;
+	public static int spawny = -100;
+	public static int x;
+	public static int y;
+	public static int velX = 0;
+	public static int velY = 0;
+	public static int posx=0, negx=0, posy=0, negy=0;
+	public static int title=1;
+	public static int h = 600;
+    public static int w = 600;
+	public static int height, width;
+	public static BufferedImage spritesheet = null;
+	public static BufferedImage image = null;
+	public static JFrame frame = new JFrame();
+    public static Button b = null;
+    public static JButton button = new JButton("Play");
+    public static int health = 20;
+    public static String[] saves;
+    public static String world;
+    public static String prevworld = null;
+    public static ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
+    public static int SelectedBlock = 1;
+    public static int menu = 0;
+    public static int[][] inventory = new int[4][9];
+    public static String CMD ="";
+    public static int[][] map;
     public Main() throws IOException {
         addKeyListener(this);
         addMouseWheelListener(this);
@@ -66,100 +70,17 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     	if(title==0||title==2||title==3) {
 	    	if(!world.equals(prevworld)) {
 	    		new textures();
-	    	    //ArrayList<ArrayList<Integer>> tempLayout = new ArrayList<>();
-	    		tempLayout.clear();
-	    		try(BufferedReader br = new BufferedReader(new FileReader("maps/"+world))){
-
-	    			String currentLine;
-	    			while((currentLine = br.readLine()) != null) {
-	    				if(currentLine.isEmpty()) {
-	    					continue;
-	    				}
-	    				ArrayList<Integer> row = new ArrayList<>();
-	    				
-	    				String[] values = currentLine.trim().split(" ");
-	    				
-	    				for(String string : values) {
-	    					if(!string.isEmpty()) {
-	    						int id = Integer.parseInt(string);
-	    						
-	    						row.add(id);
-	    					}
-	    				}
-	    				tempLayout.add(row);
-	    			}
-	    		}
-	    		catch(IOException e) {
-	    			
-	    		}
-	    		int width = tempLayout.get(0).size();
-				int height = tempLayout.size();
-				layer = new TileLayer(width, height);
-				for(int a = 0; a<height; a++) {
-					for(int b = 0; b<width;b++) {
-						layer.map[a][b] = tempLayout.get(a).get(b);
-					}
-				}
-				x = -750; 
-				y=-100;
-				prevworld=world;
+	    	    Load.load();
 	    	}
 	        super.paintComponent(g);
 			
-			int width = tempLayout.get(0).size();
-			int height = tempLayout.size();
-		    new graphics(height, width, layer, x, y, g, w, h);
-			int xpos;
-			int ypos;
-			velX=posx-negx;
-	        velY=posy-negy;
-	        int movex = 1;
-	        int movey = 1;
-	        if(title==0) {
-	        for(int yp=-24; yp<26;yp++) {
-	        	xpos=(x-h/2-25)/-50;
-				ypos=(y-w/2+yp)/-50;
-	            if(layer.map[ypos][xpos]!=0 && velX<0) {
-	    	    	if(velX<0) {
-	    	    		movex=0;
-	    	    	}
-	            	
-	    	    }
-	    		xpos=(x-h/2+26)/-50;
-	    		ypos=(y-w/2+yp)/-50;
-	            if(layer.map[ypos][xpos]!=0 && velX>0) {
-	    	    	if(velX>0) {
-	    	    		movex=0;
-	    	    	}
-	    	    }
-	        }
-	        if(movex == 1 && !(velX>0 && x==375)) {
-		        x = x + velX;
-	        }
-	        for(int xp=-24; xp<26;xp++) {
-	        	xpos=(x-h/2+xp)/-50;
-				ypos=(y-w/2-25)/-50;
-	            if(layer.map[ypos][xpos]!=0 && velY<0) {
-	    	    	if(velY<0) {
-	    	    		movey=0;
-	    	    	}
-	    	    }
-	    		xpos=(x-h/2+xp)/-50;
-	    		ypos=(y-w/2+26)/-50;
-	            if(layer.map[ypos][xpos]!=0 && velY>0) {
-	    	    	if(velY>0) {
-	    	    		movey=0;
-	    	    	}
-	    	    }
-	        }
-	        if(movey==1 && !(velY>0 && y==375)) {
-	        	y = y + velY;
-	        }
-	        }
-	        g.setColor(Color.black);
+			CollideAndMove.Collision(g);
+    		Color c= new Color (0,0,0,255);
+	        g.setColor(c);
 	        g.fillRect(w/2-25, h/2-25, 50, 50);
 	        requestFocusInWindow();
 	        button.setVisible(false);
+	        g.setColor(Color.black);
     		g.drawString("Version : 1.1.0", 10, 20);
     		g.setFont(new Font("arial", Font.PLAIN, 20));
     		g.drawString("Selected Block: #" + SelectedBlock + " " + textures.names[SelectedBlock], 10, h-50);
@@ -175,12 +96,17 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     			menu=0;
     		}
     		if(title==2) {
-    			Color c = new Color(0, 0, 0, 100);
+    			c = new Color(0, 0, 0, 100);
     			g.setColor(c);
     			g.fillRect(7, h-65, w-20, 30);
+    			c= new Color(255,255,255);
+    			g.setColor(c);
+                g.setFont(new Font("arial", Font.PLAIN, 25));
+    			String text=CMD;
+    			g.drawString(text, 20, h-40);
     		}
     		if(title==3) {
-    			Color c = new Color(0, 0, 0, 255);
+    			c = new Color(0, 0, 0, 255);
     			g.setColor(c);
     			g.fillRect(w/2-150,	h/2-30, 300, 60);
     			g.fillRect(w/2-150,	h/2+60, 300, 60);
@@ -195,7 +121,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     			g.drawString(text, w/2-(wi/2), h/2+95);
     		}
     		if(title==4) {
-    			Color c = new Color(0, 0, 0, 255);
+    			c = new Color(0, 0, 0, 255);
     			g.setColor(c);
     			g.fillRect(w/2-150,	h/2-30, 300, 60);
     			g.fillRect(w/2-150,	h/2+60, 300, 60);
@@ -205,7 +131,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     			String text="Return to game";
     			int wi =g.getFontMetrics().stringWidth(text);
     			g.drawString(text, w/2-(wi/2), h/2+5);
-    			text="Back to menu";
+    			text="Save and back to menu";
     			wi =g.getFontMetrics().stringWidth(text);
     			g.drawString(text, w/2-(wi/2), h/2+95);
     		}
@@ -252,16 +178,22 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
     }
     public void keyPressed(KeyEvent e) {
         int c = e.getKeyCode();
-        
-        if(c == KeyEvent.VK_T && title == 0) {
-        	title = 2;
-        }else if(c == KeyEvent.VK_T && title == 2) {
-        	title = 0;
-        }
-        
-        if(c == KeyEvent.VK_H && title==0) {
-        	health -=1;
-        }
+        if(title==2) {
+        	if(c==KeyEvent.VK_ESCAPE) {
+        		title=0;
+        	}else if(c==KeyEvent.VK_ENTER) {
+        		ParseCommand.parseCommand(CMD);
+        		title=0;
+        		CMD="";
+        	}else if(c==KeyEvent.VK_BACK_SPACE) {
+        		CMD = CMD.substring(0, CMD.length() - 1);
+        	}else if(c==KeyEvent.VK_SPACE) {
+        		CMD += " ";
+        	}else if(c==KeyEvent.VK_SHIFT) {
+        	}else{
+        		CMD+=e.getKeyChar();
+        	}
+        }else{
         if (c == KeyEvent.VK_A) {
             posx = 1;
         }
@@ -279,6 +211,19 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         }
         if (c == KeyEvent.VK_ESCAPE) {
 	        menu=1;
+        }
+
+        if(c == KeyEvent.VK_E && title == 0) {
+        	title=5;
+        }
+        
+        if(c == KeyEvent.VK_T && title == 0) {
+        	title = 2;
+        }
+        
+        if(c == KeyEvent.VK_H && title==0) {
+        	health -=1;
+        }
         }
     }
 	public void keyReleased(KeyEvent e) {
@@ -311,6 +256,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(t);
+        x = spawnx; y= spawny;
     }
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -331,7 +277,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         		repaint();
         	}
         	if(y1>h/2+60 && y1<h/2+90 && x1>w/2-150 && x1<w/2+150) {
-        		save();
+        		Save.save();
         		health=20;
         		title=1;
         		repaint();
@@ -343,7 +289,7 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         		repaint();
         	}
         	if(y1>h/2+60 && y1<h/2+90 && x1>w/2-150 && x1<w/2+150) {
-        		save();
+        		Save.save();
         		health=20;
         		title=1;
         		repaint();
@@ -357,8 +303,8 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         	int my =(y1-y%50)/50;
         	tilex-=mx;
         	tiley-=my;
-        	if(layer.map[-tiley][-tilex] == 0) {        		
-        		layer.map[-tiley][-tilex] = SelectedBlock;
+        	if(map[-tiley][-tilex] == 0) {        		
+        		map[-tiley][-tilex] = SelectedBlock;
         	}
         }
         }
@@ -370,8 +316,8 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
         	int my =(y1-y%50)/50;
         	tilex-=mx;
         	tiley-=my;
-        	if(layer.map[-tiley][-tilex] != 0) {
-        		layer.map[-tiley][-tilex] = 0;
+        	if(map[-tiley][-tilex] != 0) {
+        		map[-tiley][-tilex] = 0;
         	}
         	
         }
@@ -393,30 +339,11 @@ public class Main  extends JPanel  implements ActionListener, KeyListener, Mouse
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 	}
-	public void print(String s) {
-		System.out.print(s);
+	public static void print(String s) {
+		System.out.println(s);
 	}
 	public void printint(int i) {
 		System.out.println(i);
-	}
-	
-	public void save() {
-		FileWriter fstream;
-		try {
-			fstream = new FileWriter("maps/"+world, false);
-		    BufferedWriter out = new BufferedWriter(fstream);
-		    out.flush();
-		    for(int x=0; x<layer.map.length; x++) {
-		    	for(int y=0; y<layer.map[0].length; y++) {
-		    		String a =String.valueOf(layer.map[x][y]);
-				    out.write(a+" ");
-		    	}
-		    	out.write("\n");
-		    }
-		    out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent m) {
